@@ -3,7 +3,7 @@
   "repositories": [
     {
       "name": "2010-rust-rewrite-mashup",
-      "url": "https://github.com/chasmlol/2010-rust-rewrite-mashup.git",
+      "url": "https://github.com/londonbrown/2010-rust-rewrite-mashup.git",
       "commit": "ab43b8a9e923bdc4ad7effb874f6efec155577f1",
       "role": "primary-skate-adoption-source",
       "license": "Apache-2.0",
@@ -13,7 +13,7 @@
     {
       "name": "skate-3-rust-engine-donor",
       "directory": "skate-3-rust-engine-donor",
-      "url": "https://github.com/SK8-ENGINE/skate-3-rust-engine.git",
+      "url": "https://github.com/londonbrown/skate-3-rust-engine.git",
       "commit": "cb7968930f14dad38457e98720d1a274e469eec2",
       "role": "behavioral-oracle-donor-baseline",
       "license": "HUD modules (apt_*, hud_runtime) and tools/asset_pipeline: Apache-2.0 by chasmlol's grant, 2026-10-07 (NOTICE); rest reference only. Repo GPL-3.0 from 8280fc4",
@@ -23,7 +23,7 @@
     {
       "name": "skate-3-rust-engine-current",
       "directory": "skate-3-rust-engine-current",
-      "url": "https://github.com/SK8-ENGINE/skate-3-rust-engine.git",
+      "url": "https://github.com/londonbrown/skate-3-rust-engine.git",
       "commit": "60efdef86600d8d8d4feb4b7c608fa0efd0643d7",
       "role": "newer-behavioral-reference",
       "license": "GPL-3.0 from 8280fc4 (2026-10-04); this snapshot predates it. Reference only (NOTICE)",
@@ -32,7 +32,7 @@
     },
     {
       "name": "rage-formats",
-      "url": "https://github.com/VIRUXE/rage-formats.git",
+      "url": "https://github.com/londonbrown/rage-formats.git",
       "commit": "0488fc99d2d911c4da59288e1286a559e2bc7d45",
       "role": "RAGE resource/YBN parser",
       "license": "Unlicense",
@@ -40,7 +40,7 @@
     },
     {
       "name": "rpf-archive-rs",
-      "url": "https://github.com/VIRUXE/rpf-archive-rs.git",
+      "url": "https://github.com/londonbrown/rpf-archive-rs.git",
       "commit": "edd77588ed7fcf3cdd51949e7d3e647204c76036",
       "role": "RPF7 archive access",
       "license": "Unlicense",
@@ -52,7 +52,8 @@
       "commit": "d87aa3d6539ba9c98ebbcdce273317172663d67c",
       "role": "retail-key extraction and archive preparation helper",
       "license": "Unlicense",
-      "default_fetch": true
+      "default_fetch": false,
+      "notes": "Deckrunner: not used, not fetched."
     },
     {
       "name": "rage-render",
@@ -60,7 +61,8 @@
       "commit": "b62485d3e0172d8e2bbcfda5d00c59630bdf65f1",
       "role": "rage-cli pinned dependency/reference",
       "license": "Unlicense",
-      "default_fetch": true
+      "default_fetch": false,
+      "notes": "Deckrunner: not used, not fetched."
     },
     {
       "name": "iw4L",
