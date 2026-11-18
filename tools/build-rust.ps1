@@ -7,8 +7,8 @@ $Manifest=Join-Path $Root 'rust/Cargo.toml'
 # cargo reports warnings/progress on stderr; Windows PowerShell 5.1 would
 # turn that into a terminating error under 'Stop'. Exit codes are checked.
 $ErrorActionPreference='Continue'
-# The runtime, the audio decoder and the setup tools (live_clip, skatev-ped-export, xex_image, skatev-world-cache).
-$cargoArgs=@('build','--manifest-path',$Manifest,'-p','skatev-runtime','-p','skate-xma','-p','skatev-ped-export','-p','skatev-world-cache')
+# The runtime and the audio decoder (Deckrunner: the GTA tools are not built).
+$cargoArgs=@('build','--manifest-path',$Manifest,'-p','skatev-runtime','-p','skate-xma')
 if($Profile -eq 'release'){$cargoArgs += '--release'}
 & cargo @cargoArgs
 if($LASTEXITCODE -ne 0){throw 'Rust runtime build failed'}
@@ -30,7 +30,7 @@ Copy-Item -LiteralPath $decoder -Destination (Join-Path $toolsBin 'skate-xma.exe
 Copy-Item -LiteralPath $decoder -Destination (Join-Path $package 'skate-xma.exe') -Force
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'prepare-skate-audio.py') -Destination $package -Force
 # Base default.xex decoder for tools/prepare-audio-tuning.py --xex.
-$xexArgs=@('build','--manifest-path',$Manifest,'-p','skatev-ped-export','--bin','xex_image')
+$xexArgs=@('build','--manifest-path',$Manifest,'-p','xex-image','--bin','xex_image')
 if($Profile -eq 'release'){$xexArgs += '--release'}
 & cargo @xexArgs
 if($LASTEXITCODE -ne 0){throw 'xex_image build failed'}

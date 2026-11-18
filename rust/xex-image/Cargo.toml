@@ -1,0 +1,16 @@
+[package]
+name = "xex-image"
+version = "0.1.0"
+edition = "2024"
+publish = false
+description = "Decodes the player's own Skate 3 default.xex to its base image (moved out of skatev-ped-export so it needs no GTA crates)"
+
+[[bin]]
+name = "xex_image"
+path = "src/main.rs"
+
+[dependencies]
+aes = "0.8"
+anyhow = "1"
+lzxd = "0.2"
+sha1 = "0.10"

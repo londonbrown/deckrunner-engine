@@ -4,7 +4,7 @@ The input is produced by SkateV's owned-data converter. No game heap or
 generated reverse-engineering output is needed. Component export additionally
 reads two executable-resident tables, either from an explicitly supplied
 owned TU3 executable image based at 0x82000000 (--guest-image) or straight
-from a base disc default.xex (--xex, decoded by rust/ped-export xex_image).
+from a base disc default.xex (--xex, decoded by rust/xex-image).
 Output is private data; do not redistribute it.
 """
 import argparse
@@ -90,7 +90,7 @@ def find_xex_tool(given):
     for c in ([Path(given)] if given else []) + [d / n for d in dirs for n in names]:
         if c.is_file():
             return c
-    raise FileNotFoundError('xex_image not found (cargo build --release -p skatev-ped-export --bin xex_image, or --xex-tool)')
+    raise FileNotFoundError('xex_image not found (cargo build --release -p xex-image, or --xex-tool)')
 
 
 def image_from_xex(xex, tool=None):

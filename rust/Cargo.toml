@@ -1,6 +1,8 @@
 [workspace]
 resolver = "3"
-members = ["svwc", "world-cache", "gta-archives", "skatev-runtime", "ped-export", "skate-aems", "skate-hud", "skate-xma"]
+# Deckrunner: the GTA crates (world-cache, gta-archives, ped-export) are not built; xex_image has its own crate.
+members = ["svwc", "skatev-runtime", "skate-aems", "skate-hud", "skate-xma", "xex-image"]
+exclude = ["world-cache", "gta-archives", "ped-export"]
 
 # The runtime runs inside GTA: unwind so panics can be caught at the C ABI
 # and on the Skate worker instead of taking the game process down.
