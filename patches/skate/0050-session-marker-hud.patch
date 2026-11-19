@@ -1,0 +1,106 @@
+diff --git a/crates/skate-host/src/physics/bridge/hud.rs b/crates/skate-host/src/physics/bridge/hud.rs
+index a876b20..cfa0357 100644
+--- a/crates/skate-host/src/physics/bridge/hud.rs
++++ b/crates/skate-host/src/physics/bridge/hud.rs
+@@ -37,7 +37,43 @@ pub struct HudInput {
+     pub close_tricks: bool,
+ }
+ 
++/// Skate's session marker as a HUD shows it (overlay patch 0050), after the
++/// last `advance`: Skate 3's marker prompts show while LB is held.
++#[derive(Clone, Copy, Debug, Default, PartialEq)]
++pub struct MarkerHud {
++    /// LB is held: the marker's prompts are up.
++    pub visible: bool,
++    /// A marker can be placed here now.
++    pub can_place: bool,
++    /// A marker is placed and can be returned to now.
++    pub can_return: bool,
++    /// How far LB + d-pad up's hold has run toward the return (0..1; it
++    /// fires at 1: 0.2 s within 100 m of the marker, up to 1 s at 1 km).
++    pub progress: f32,
++    /// Counts since the session began: markers placed, placements refused,
++    /// returns made, and return holds let go before they fired.
++    pub placed: u32,
++    pub refused: u32,
++    pub returned: u32,
++    pub short_holds: u32,
++}
++
+ impl Session {
++    /// SkateV (patch 0050): the session marker's HUD publication.
++    pub fn marker_hud(&self) -> MarkerHud {
++        let m = self.markers.state();
++        MarkerHud {
++            visible: m.visible,
++            can_place: m.can_place,
++            can_return: m.can_return,
++            progress: m.progress,
++            placed: m.placed,
++            refused: m.refused,
++            returned: m.returned,
++            short_holds: m.short_holds,
++        }
++    }
++
+     /// SkateV: the scorer's HUD publication after the last `advance`.
+     pub fn hud_input(&self) -> HudInput {
+         let scoring = &self.skater.scoring;
+diff --git a/crates/skate-host/src/session_marker/mod.rs b/crates/skate-host/src/session_marker/mod.rs
+index 3ab3b98..6edc220 100644
+--- a/crates/skate-host/src/session_marker/mod.rs
++++ b/crates/skate-host/src/session_marker/mod.rs
+@@ -24,6 +24,12 @@ pub(crate) struct SessionMarker {
+     pub can_place: bool,
+     pub can_return: bool,
+     pub progress: f32,
++    /// SkateV (patch 0050): counts for a HUD: markers placed, placements
++    /// refused, returns made, and return holds let go before they fired.
++    pub placed: u32,
++    pub refused: u32,
++    pub returned: u32,
++    pub short_holds: u32,
+     blocked_until_release: bool,
+     ui_time: f64,
+     last_batch: u64,
+@@ -33,7 +39,9 @@ pub(crate) struct SessionMarker {
+ pub(crate) struct Runtime { session: SessionMarker, validation: validation::Validation }
+ impl Runtime {
+     pub fn load(root: &std::path::Path) -> Result<Self,String> { Ok(Self{session:SessionMarker::default(),validation:validation::Validation::load(root)?}) }
+-    pub fn suspend(&mut self) { self.session.hold.cancel(); self.session.blocked_until_release=true; self.session.ui_time=0.; }
++    pub fn suspend(&mut self) { self.session.hold.cancel(); self.session.blocked_until_release=true; self.session.ui_time=0.; self.session.progress=0.; }
++    /// SkateV (patch 0050): the marker's state as a HUD reads it.
++    pub(crate) fn state(&self) -> &SessionMarker { &self.session }
+     pub fn collect_time(&mut self,dt:f64) { self.session.ui_time+=dt; }
+     pub fn advance(&mut self,input:&ControllerInput,physics:&GamePhysics,skater:&mut SkaterRuntime) {
+         update(&mut self.session,input,physics,skater,&self.validation);
+@@ -95,8 +103,10 @@ fn update(session:&mut SessionMarker,input:&ControllerInput,physics:&GamePhysics
+                 foot_forward: skater.animation.foot_forward(),
+                 generation: 0,
+             });
++            session.placed = session.placed.wrapping_add(1);
+             bevy::log::info!("Skate session marker placed");
+         } else {
++            session.refused = session.refused.wrapping_add(1);
+             bevy::log::info!("Skate session marker placement refused");
+         }
+     }
+@@ -114,6 +124,10 @@ fn update(session:&mut SessionMarker,input:&ControllerInput,physics:&GamePhysics
+     let usable = session.can_return;
+     while session.ui_time >= 1. / 60. {
+         session.ui_time -= 1. / 60.;
++        // SkateV (patch 0050): a return's hold let go before it fired.
++        if !held && session.progress > 0. && session.progress < 1. {
++            session.short_holds = session.short_holds.wrapping_add(1);
++        }
+         let step = session.hold.update(held, usable, distance, ready);
+         session.progress = step.progress;
+         if step.relocate {
+@@ -124,6 +138,7 @@ fn update(session:&mut SessionMarker,input:&ControllerInput,physics:&GamePhysics
+                         skater
+                             .teleport_state
+                             .request_manual(target.transform, target.on_board);
++                        session.returned = session.returned.wrapping_add(1);
+                         bevy::log::info!("Skate session marker returned");
+                     }
+                     Err(e) => {
